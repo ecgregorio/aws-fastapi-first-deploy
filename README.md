@@ -16,13 +16,13 @@ Currently in early early experimentation phase.
 - Networking / Deployment: Nginx reverse proxy, HTTPS with Certbot, SSH, systemd service management
 
 ## Live Server
-You can access the API here:
+You can access the homepage here:
 
-🌐 https://www.evangregorio.me
+🌐 https://evangregorio.me
 
 You can also access the interactive API docs (Swagger UI) directly:
 
-🌐 https://www.evangregorio.me/docs
+🌐 https://api.evangregorio.me/docs
 
 ## Preview
 
