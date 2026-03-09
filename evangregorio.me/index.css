@@ -750,3 +750,13 @@ body {
     width: min(100%, 220px);
   }
 }
+
+.dashboard-grid {
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+}
+
+.dashboard-card h3 {
+  margin-top: 0.45rem;
+  font-size: clamp(1.3rem, 3vw, 2rem);
+  color: var(--text);
+}
