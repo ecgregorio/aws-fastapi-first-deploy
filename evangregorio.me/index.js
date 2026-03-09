@@ -176,6 +176,25 @@
         apiStatusNode.textContent = (data.api_status || "ok").toUpperCase();
         apiMessageNode.textContent = "Stats endpoint responding normally.";
         generatedAtNode.textContent = formatUtc(data.generated_at || "");
+
+        // --- readable UTC+8 format --- 
+        if (data.generated_at) {
+          var date = new Date(data.generated_at);
+          
+          // Formats to: "Mar 10, 2026, 4:15 PM" in UTC+8
+          generatedAtNode.textContent = date.toLocaleString('en-US', {
+            timeZone: 'Asia/Singapore', // forces UTC+8
+            month: 'short',
+            day: 'numeric',
+            year: 'numeric',
+            hour: 'numeric',
+            minute: '2-digit',
+            hour12: true
+          });
+        } else {
+          generatedAtNode.textContent = "Never";
+        }
+        // ---------------
       })
       .catch(function (err) {
         userCountNode.textContent = "--";
