@@ -1,5 +1,8 @@
 name: Deploy API and Frontend
 
+permissions:
+  contents: write
+
 on:
   push:
     branches:
@@ -110,6 +113,39 @@ jobs:
             wait_for_url "$API_HEALTH_URL" "API"
             wait_for_url "$ROOT_HEALTH_URL" "Root site"
 
+      - name: Checkout staging branch
+        uses: actions/checkout@v4
+        with:
+          ref: staging
+          fetch-depth: 0
+
+      - name: Record staging deployment as bot commit
+        run: |
+          set -euo pipefail
+
+          MARKER_FILE=".github/deploy-markers/staging.txt"
+          mkdir -p "$(dirname "$MARKER_FILE")"
+
+          {
+            echo "last_deployed_at_utc=$(date -u +\"%Y-%m-%dT%H:%M:%SZ\")"
+            echo "environment=staging"
+            echo "workflow_run_id=${GITHUB_RUN_ID}"
+            echo "deployed_from_commit=${GITHUB_SHA}"
+          } > "$MARKER_FILE"
+
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+          git add "$MARKER_FILE"
+
+          if git diff --cached --quiet; then
+            echo "No marker change detected; skipping commit."
+            exit 0
+          fi
+
+          git commit -m "chore: record staging deploy [skip ci]"
+          git push origin HEAD:staging
+
   deploy-production:
     name: Deploy Production
     runs-on: ubuntu-latest
@@ -203,3 +239,36 @@ jobs:
 
             wait_for_url "$API_HEALTH_URL" "API"
             wait_for_url "$ROOT_HEALTH_URL" "Root site"
+
+      - name: Checkout main branch
+        uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
+
+      - name: Record production deployment as bot commit
+        run: |
+          set -euo pipefail
+
+          MARKER_FILE=".github/deploy-markers/production.txt"
+          mkdir -p "$(dirname "$MARKER_FILE")"
+
+          {
+            echo "last_deployed_at_utc=$(date -u +\"%Y-%m-%dT%H:%M:%SZ\")"
+            echo "environment=production"
+            echo "workflow_run_id=${GITHUB_RUN_ID}"
+            echo "deployed_from_commit=${GITHUB_SHA}"
+          } > "$MARKER_FILE"
+
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+          git add "$MARKER_FILE"
+
+          if git diff --cached --quiet; then
+            echo "No marker change detected; skipping commit."
+            exit 0
+          fi
+
+          git commit -m "chore: record production deploy [skip ci]"
+          git push origin HEAD:main
